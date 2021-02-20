@@ -1,5 +1,9 @@
 import com.hp.hpl.jena.rdf.model.*;
+import com.hp.hpl.jena.shared.ClosedException;
 import com.hp.hpl.jena.vocabulary.*;
+
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class WebSemantique {
     static String PersonURI = "http://personne/rdf/";
@@ -35,7 +39,7 @@ public class WebSemantique {
     static String JupiterOrchestre = "orchestre symphonique de londre";
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Model model = ModelFactory.createDefaultModel();
 
         model.setNsPrefix("person", PersonURI);
@@ -69,46 +73,52 @@ public class WebSemantique {
         Resource ClaudioAbbado = model.createResource(ClaudioURI).addProperty(Nom, ClaudioNom);
         Resource Partie = model.createResource(PartieURI).addProperty(PropertyPart4, Partie4).addProperty(PropertyPart3, Partie3).addProperty(PropertyPart2, Partie2).addProperty(PropertyPart1, Partie1);
         Resource Jupiter = model.createResource(JupiterURI).addProperty(PartieDe, Partie).addProperty(EnregistrerSous, ClaudioAbbado).addProperty(OrchestreSymphonique, JupiterOrchestre).addProperty(AnneeEnregistrement, JupiterAnneeEnregistrement).addProperty(Type, JupiterType).addProperty(Propriete, JupiterPropritete).addProperty(Titre, JupiterTitre).addProperty(Compositeur, WolfgangMozart);
-        model.write(System.out);
-        /*
-        tutorial n°03
-        // some definitions
-        String personURI = "http://somewhere/JohnSmith";
-        String givenName = "John";
-        String familyName = "Smith";
-        String fullName = givenName + " " + familyName;
-        // create an empty model
-        Model model = ModelFactory.createDefaultModel();
-
-        // create the resource
-        //   and add the properties cascading style
-        Resource johnSmith
-                = model.createResource(personURI)
-                .addProperty(VCARD.FN, fullName)
-                .addProperty(VCARD.N,
-                        model.createResource()
-                                .addProperty(VCARD.Given, givenName)
-                                .addProperty(VCARD.Family, familyName));
-
-        // list the statements in the graph
-        StmtIterator iter = model.listStatements();
-
-        // print out the predicate, subject and object of each statement
-        while (iter.hasNext()) {
-            Statement stmt = iter.nextStatement();         // get next statement
-            Resource subject = stmt.getSubject();   // get the subject
-            Property predicate = stmt.getPredicate(); // get the predicate
-            RDFNode object = stmt.getObject();    // get the object
-
-            System.out.print(subject.toString());
-            System.out.print(" " + predicate.toString() + " ");
-            if (object instanceof Resource) {
-                System.out.print(object.toString());
-            } else {
-                // object is a literal
-                System.out.print(" \"" + object.toString() + "\"");
+        //Fichier XML
+        FileWriter RDFXMLOUT = new FileWriter("Text.xml");
+        try {
+            model.write(RDFXMLOUT);
+        } finally {
+            try {
+                RDFXMLOUT.close();
+            } catch (IOException e) {
+                //ignore
             }
-            System.out.println(" .");
+        }
+
+        //Fichier N-TRIPLET
+        FileWriter NTRIPLETOUT = new FileWriter("Text.nt");
+        try {
+            model.write(NTRIPLETOUT, "N-TRIPLE");
+        } finally {
+            try {
+                NTRIPLETOUT.close();
+            } catch (IOException e) {
+                //ignore
+            }
+        }
+
+        //Fichier TURTLE
+        FileWriter TURTLEOUT = new FileWriter("Text.ttl");
+        try {
+            model.write(TURTLEOUT, "TURTLE");
+        } finally {
+            try {
+                TURTLEOUT.close();
+            } catch (IOException e) {
+                //ignore
+            }
+        }
+
+        //Fichier JSON
+        /*FileWriter JSONOUT = new FileWriter("Text.rj");
+        try {
+            model.write(JSONOUT, "RDF/JSON");
+        } finally {
+            try {
+                JSONOUT.close();
+            } catch (IOException e) {
+                //ignore
+            }
         }*/
     }
 }

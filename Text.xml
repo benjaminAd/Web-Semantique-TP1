@@ -1,0 +1,39 @@
+<rdf:RDF
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:person="http://personne/rdf/"
+    xmlns:symphonie="http://jupiter/rdf/" > 
+  <rdf:Description rdf:about="http://personne/rdf/LeoMozart">
+    <person:Nom>Leopold Mozart</person:Nom>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://personne/rdf/ConWeber">
+    <person:Nom>Constance Weber</person:Nom>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://jupiter/rdf/Partie">
+    <symphonie:Partie_1>Molto Allegro</symphonie:Partie_1>
+    <symphonie:Partie_2>Manuetto</symphonie:Partie_2>
+    <symphonie:Partie_3>Allegro vivace</symphonie:Partie_3>
+    <symphonie:Partie_4>Andante cantabile</symphonie:Partie_4>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://personne/rdf/WolfgangMozart">
+    <person:Nom>Wolfgang Amadeus Mozart</person:Nom>
+    <person:Née_à>Salzbourg</person:Née_à>
+    <person:Née_le>27 janvier 1756</person:Née_le>
+    <person:Fils_De rdf:resource="http://personne/rdf/LeoMozart"/>
+    <person:Mari_De rdf:resource="http://personne/rdf/ConWeber"/>
+    <person:Décédé_le>5 decembre 1791</person:Décédé_le>
+    <person:Décédé_à>Vienne</person:Décédé_à>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://jupiter/rdf/jupiter">
+    <symphonie:compositeur rdf:resource="http://personne/rdf/WolfgangMozart"/>
+    <symphonie:Titre>Jupiter</symphonie:Titre>
+    <symphonie:Propriété>41 Symphonie en ut majeur de Mozart</symphonie:Propriété>
+    <symphonie:Type>Symphonie</symphonie:Type>
+    <symphonie:Année_Enregistrement>1980</symphonie:Année_Enregistrement>
+    <symphonie:Orchestre_Symphonique>orchestre symphonique de londre</symphonie:Orchestre_Symphonique>
+    <symphonie:Enregistrer_sous_direction_de rdf:resource="http://personne/rdf/ClaudioAbbado"/>
+    <symphonie:Partie_de rdf:resource="http://jupiter/rdf/Partie"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://personne/rdf/ClaudioAbbado">
+    <person:Nom>Claudio Abbado</person:Nom>
+  </rdf:Description>
+</rdf:RDF>

@@ -1,0 +1,40 @@
+@prefix symphonie:  <http://jupiter/rdf/> .
+@prefix person:  <http://personne/rdf/> .
+
+person:LeoMozart
+      person:Nom "Leopold Mozart" .
+
+person:ConWeber
+      person:Nom "Constance Weber" .
+
+symphonie:Partie
+      symphonie:Partie_1 "Molto Allegro" ;
+      symphonie:Partie_2 "Manuetto" ;
+      symphonie:Partie_3 "Allegro vivace" ;
+      symphonie:Partie_4 "Andante cantabile" .
+
+person:WolfgangMozart
+      person:Décédé_le "5 decembre 1791" ;
+      person:Décédé_à "Vienne" ;
+      person:Fils_De person:LeoMozart ;
+      person:Mari_De person:ConWeber ;
+      person:Nom "Wolfgang Amadeus Mozart" ;
+      person:Née_le "27 janvier 1756" ;
+      person:Née_à "Salzbourg" .
+
+symphonie:jupiter
+      symphonie:Année_Enregistrement
+              "1980" ;
+      symphonie:Enregistrer_sous_direction_de
+              person:ClaudioAbbado ;
+      symphonie:Orchestre_Symphonique
+              "orchestre symphonique de londre" ;
+      symphonie:Partie_de symphonie:Partie ;
+      symphonie:Propriété "41 Symphonie en ut majeur de Mozart" ;
+      symphonie:Titre "Jupiter" ;
+      symphonie:Type "Symphonie" ;
+      symphonie:compositeur
+              person:WolfgangMozart .
+
+person:ClaudioAbbado
+      person:Nom "Claudio Abbado" .
