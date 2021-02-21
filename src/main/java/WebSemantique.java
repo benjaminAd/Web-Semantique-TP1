@@ -1,6 +1,10 @@
+import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.shared.ClosedException;
 import com.hp.hpl.jena.vocabulary.*;
+import org.apache.jena.sparql.core.DatasetGraph;
+import org.apache.jena.sparql.core.DatasetGraphFactory;
+import org.apache.jena.sparql.graph.GraphFactory;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -74,7 +78,7 @@ public class WebSemantique {
         Resource Partie = model.createResource(PartieURI).addProperty(PropertyPart4, Partie4).addProperty(PropertyPart3, Partie3).addProperty(PropertyPart2, Partie2).addProperty(PropertyPart1, Partie1);
         Resource Jupiter = model.createResource(JupiterURI).addProperty(PartieDe, Partie).addProperty(EnregistrerSous, ClaudioAbbado).addProperty(OrchestreSymphonique, JupiterOrchestre).addProperty(AnneeEnregistrement, JupiterAnneeEnregistrement).addProperty(Type, JupiterType).addProperty(Propriete, JupiterPropritete).addProperty(Titre, JupiterTitre).addProperty(Compositeur, WolfgangMozart);
         //Fichier XML
-        FileWriter RDFXMLOUT = new FileWriter("Text.xml");
+        FileWriter RDFXMLOUT = new FileWriter("src/main/resources/Text.xml");
         try {
             model.write(RDFXMLOUT);
         } finally {
@@ -86,7 +90,7 @@ public class WebSemantique {
         }
 
         //Fichier N-TRIPLET
-        FileWriter NTRIPLETOUT = new FileWriter("Text.nt");
+        FileWriter NTRIPLETOUT = new FileWriter("src/main/resources/Text.nt");
         try {
             model.write(NTRIPLETOUT, "N-TRIPLE");
         } finally {
@@ -98,7 +102,7 @@ public class WebSemantique {
         }
 
         //Fichier TURTLE
-        FileWriter TURTLEOUT = new FileWriter("Text.ttl");
+        FileWriter TURTLEOUT = new FileWriter("src/main/resources/Text.ttl");
         try {
             model.write(TURTLEOUT, "TURTLE");
         } finally {
@@ -108,9 +112,13 @@ public class WebSemantique {
                 //ignore
             }
         }
+//        DatasetGraph graphe =DatasetGraphFactory.create();
+//        graphe.
 
         //Fichier JSON
-        /*FileWriter JSONOUT = new FileWriter("Text.rj");
+        /*
+        Ne reconnait pas le RDF/JSON
+        FileWriter JSONOUT = new FileWriter("Text.rj");
         try {
             model.write(JSONOUT, "RDF/JSON");
         } finally {
