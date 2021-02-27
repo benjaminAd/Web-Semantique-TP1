@@ -2,12 +2,15 @@ import com.hp.hpl.jena.graph.Graph;
 import com.hp.hpl.jena.rdf.model.*;
 import com.hp.hpl.jena.shared.ClosedException;
 import com.hp.hpl.jena.vocabulary.*;
+import javafx.util.Pair;
 import org.apache.jena.sparql.core.DatasetGraph;
 import org.apache.jena.sparql.core.DatasetGraphFactory;
 import org.apache.jena.sparql.graph.GraphFactory;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 
 public class WebSemantique {
     static String PersonURI = "http://personne/rdf/";
@@ -42,6 +45,100 @@ public class WebSemantique {
     static String JupiterAnneeEnregistrement = "1980";
     static String JupiterOrchestre = "orchestre symphonique de londre";
 
+
+    private Model model;
+
+    public WebSemantique(Model model, List<Pair<String, String>> prefixs) {
+        this.model = model;
+        for (Pair<String, String> s : prefixs) {
+            model.setNsPrefix(s.getKey(), s.getValue());
+        }
+    }
+
+    public void addStatement(String s, String p, String o) {
+        Resource subject = this.model.createResource(s);
+        Property predicate = this.model.createProperty(p);
+        RDFNode object = this.model.createResource(o);
+        Statement stmt = this.model.createStatement(subject, predicate, object);
+        model.add(stmt);
+    }
+
+    public void CreateModel() {
+        addStatement(LeoMozartURI, PersonURI + "Nom", LeoMozartNom);
+
+        addStatement(ConsWebURI, PersonURI + "Nom", ConsWebNom);
+
+        addStatement(MozartURI, PersonURI + "Décédé_à", MozartPOD);
+        addStatement(MozartURI, PersonURI + "Décédé_le", MozartDOD);
+        addStatement(MozartURI, PersonURI + "Mari_De", ConsWebURI);
+        addStatement(MozartURI, PersonURI + "Fils_De", LeoMozartURI);
+        addStatement(MozartURI, PersonURI + "Née_le", DOBMozart);
+        addStatement(MozartURI, PersonURI + "Née_à", BirthPlaceMozard);
+        addStatement(MozartURI, PersonURI + "Nom", MozartNom);
+
+        addStatement(ClaudioURI, PersonURI + "Nom", ClaudioNom);
+
+        addStatement(PartieURI, SymphonieURI + "Partie_4", Partie4);
+        addStatement(PartieURI, SymphonieURI + "Partie_3", Partie3);
+        addStatement(PartieURI, SymphonieURI + "Partie_2", Partie2);
+        addStatement(PartieURI, SymphonieURI + "Partie_1", Partie1);
+
+        addStatement(JupiterURI, SymphonieURI + "Partie_de", PartieURI);
+        addStatement(JupiterURI, SymphonieURI + "Enregistrer_sous_direction_de", ClaudioURI);
+        addStatement(JupiterURI, SymphonieURI + "Orchestre_Symphonique", JupiterOrchestre);
+        addStatement(JupiterURI, SymphonieURI + "Année_Enregistrement", JupiterAnneeEnregistrement);
+        addStatement(JupiterURI, SymphonieURI + "Type", JupiterType);
+        addStatement(JupiterURI, SymphonieURI + "Propriété", JupiterPropritete);
+        addStatement(JupiterURI, SymphonieURI + "Titre", JupiterTitre);
+        addStatement(JupiterURI, SymphonieURI + "compositeur", MozartURI);
+    }
+
+    public void writeModel() throws IOException {
+        writeModel("");
+    }
+
+    public void writeModel(String format) throws IOException {
+        switch (format) {
+            case "":
+                FileWriter RDFXMLOUT = new FileWriter("src/main/resources/Text.xml");
+                try {
+                    model.write(RDFXMLOUT);
+                } finally {
+                    try {
+                        RDFXMLOUT.close();
+                    } catch (IOException e) {
+                        //ignore
+                    }
+                }
+                break;
+            case "N-TRIPLE":
+                FileWriter NTRIPLETOUT = new FileWriter("src/main/resources/Text.nt");
+                try {
+                    model.write(NTRIPLETOUT, "N-TRIPLE");
+                } finally {
+                    try {
+                        NTRIPLETOUT.close();
+                    } catch (IOException e) {
+                        //ignore
+                    }
+                }
+                break;
+            case "TURTLE":
+                FileWriter TURTLEOUT = new FileWriter("src/main/resources/Text.ttl");
+                try {
+                    model.write(TURTLEOUT, "TURTLE");
+                } finally {
+                    try {
+                        TURTLEOUT.close();
+                    } catch (IOException e) {
+                        //ignore
+                    }
+                }
+                break;
+            default:
+                System.err.println("Voici les seuls formats disponible : N-TRIPLE, TURTLE, méthode sans argument pour RDF/XML");
+        }
+    }
 
     public static void main(String[] args) throws IOException {
         Model model = ModelFactory.createDefaultModel();
