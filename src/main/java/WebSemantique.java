@@ -9,6 +9,7 @@ import org.apache.jena.sparql.graph.GraphFactory;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -55,12 +56,30 @@ public class WebSemantique {
         }
     }
 
+    /**
+     * @param s subject
+     * @param p propriety
+     * @param o object --> S'il pointe vers une ressource alors o devra suivre ce format : "URI|..."
+     */
     public void addStatement(String s, String p, String o) {
-        Resource subject = this.model.createResource(s);
-        Property predicate = this.model.createProperty(p);
-        RDFNode object = this.model.createResource(o);
-        Statement stmt = this.model.createStatement(subject, predicate, object);
-        model.add(stmt);
+        Resource res;
+        Property property;
+        String[] dataO = o.split("\\|");
+        if ((res = model.getResource(s)) == null) {
+            res = model.createResource(s);
+            if ((property = model.getProperty(p)) == null) {
+                property = model.createProperty(p);
+            }
+            if (dataO.length != 2) res.addProperty(property, o);
+            else res.addProperty(property, model.getResource(dataO[1]));
+        } else {
+            if ((property = model.getProperty(p)) == null) {
+                property = model.createProperty(p);
+
+            }
+            if (dataO.length != 2) res.addProperty(property, o);
+            else res.addProperty(property, model.getResource(dataO[1]));
+        }
     }
 
     public void CreateModel() {
@@ -70,8 +89,8 @@ public class WebSemantique {
 
         addStatement(MozartURI, PersonURI + "Décédé_à", MozartPOD);
         addStatement(MozartURI, PersonURI + "Décédé_le", MozartDOD);
-        addStatement(MozartURI, PersonURI + "Mari_De", ConsWebURI);
-        addStatement(MozartURI, PersonURI + "Fils_De", LeoMozartURI);
+        addStatement(MozartURI, PersonURI + "Mari_De", "URI|" + ConsWebURI);
+        addStatement(MozartURI, PersonURI + "Fils_De", "URI|" + LeoMozartURI);
         addStatement(MozartURI, PersonURI + "Née_le", DOBMozart);
         addStatement(MozartURI, PersonURI + "Née_à", BirthPlaceMozard);
         addStatement(MozartURI, PersonURI + "Nom", MozartNom);
@@ -83,24 +102,24 @@ public class WebSemantique {
         addStatement(PartieURI, SymphonieURI + "Partie_2", Partie2);
         addStatement(PartieURI, SymphonieURI + "Partie_1", Partie1);
 
-        addStatement(JupiterURI, SymphonieURI + "Partie_de", PartieURI);
-        addStatement(JupiterURI, SymphonieURI + "Enregistrer_sous_direction_de", ClaudioURI);
+        addStatement(JupiterURI, SymphonieURI + "Partie_de", "URI|" + PartieURI);
+        addStatement(JupiterURI, SymphonieURI + "Enregistrer_sous_direction_de", "URI|" + ClaudioURI);
         addStatement(JupiterURI, SymphonieURI + "Orchestre_Symphonique", JupiterOrchestre);
         addStatement(JupiterURI, SymphonieURI + "Année_Enregistrement", JupiterAnneeEnregistrement);
         addStatement(JupiterURI, SymphonieURI + "Type", JupiterType);
         addStatement(JupiterURI, SymphonieURI + "Propriété", JupiterPropritete);
         addStatement(JupiterURI, SymphonieURI + "Titre", JupiterTitre);
-        addStatement(JupiterURI, SymphonieURI + "compositeur", MozartURI);
+        addStatement(JupiterURI, SymphonieURI + "compositeur", "URI|" + MozartURI);
     }
 
-    public void writeModel() throws IOException {
-        writeModel("");
+    public void writeModel(String output) throws IOException {
+        writeModel(output, "");
     }
 
-    public void writeModel(String format) throws IOException {
+    public void writeModel(String output, String format) throws IOException {
         switch (format) {
             case "":
-                FileWriter RDFXMLOUT = new FileWriter("src/main/resources/Text.xml");
+                FileWriter RDFXMLOUT = new FileWriter("src/main/resources/" + output + ".xml");
                 try {
                     model.write(RDFXMLOUT);
                 } finally {
@@ -112,7 +131,7 @@ public class WebSemantique {
                 }
                 break;
             case "N-TRIPLE":
-                FileWriter NTRIPLETOUT = new FileWriter("src/main/resources/Text.nt");
+                FileWriter NTRIPLETOUT = new FileWriter("src/main/resources/" + output + ".nt");
                 try {
                     model.write(NTRIPLETOUT, "N-TRIPLE");
                 } finally {
@@ -124,7 +143,7 @@ public class WebSemantique {
                 }
                 break;
             case "TURTLE":
-                FileWriter TURTLEOUT = new FileWriter("src/main/resources/Text.ttl");
+                FileWriter TURTLEOUT = new FileWriter("src/main/resources/" + output + ".ttl");
                 try {
                     model.write(TURTLEOUT, "TURTLE");
                 } finally {
@@ -141,89 +160,13 @@ public class WebSemantique {
     }
 
     public static void main(String[] args) throws IOException {
-        Model model = ModelFactory.createDefaultModel();
-
-        model.setNsPrefix("person", PersonURI);
-        model.setNsPrefix("symphonie", SymphonieURI);
-
-        Property Nom = model.createProperty(PersonURI, "Nom");
-        Property FilsDe = model.createProperty(PersonURI, "Fils_De");
-        Property MariDe = model.createProperty(PersonURI, "Mari_De");
-        Property NeeLe = model.createProperty(PersonURI, "Née_le");
-        Property NeeA = model.createProperty(PersonURI, "Née_à");
-        Property DCDLe = model.createProperty(PersonURI, "Décédé_le");
-        Property DCDA = model.createProperty(PersonURI, "Décédé_à");
-
-        Property PropertyPart1 = model.createProperty(SymphonieURI, "Partie_1");
-        Property PropertyPart2 = model.createProperty(SymphonieURI, "Partie_2");
-        Property PropertyPart3 = model.createProperty(SymphonieURI, "Partie_3");
-        Property PropertyPart4 = model.createProperty(SymphonieURI, "Partie_4");
-
-        Property Compositeur = model.createProperty(SymphonieURI, "compositeur");
-        Property Titre = model.createProperty(SymphonieURI, "Titre");
-        Property Propriete = model.createProperty(SymphonieURI, "Propriété");
-        Property Type = model.createProperty(SymphonieURI, "Type");
-        Property AnneeEnregistrement = model.createProperty(SymphonieURI, "Année_Enregistrement");
-        Property OrchestreSymphonique = model.createProperty(SymphonieURI, "Orchestre_Symphonique");
-        Property EnregistrerSous = model.createProperty(SymphonieURI, "Enregistrer_sous_direction_de");
-        Property PartieDe = model.createProperty(SymphonieURI, "Partie_de");
-
-        Resource LeoMozart = model.createResource(LeoMozartURI).addProperty(Nom, LeoMozartNom);
-        Resource ConsWeber = model.createResource(ConsWebURI).addProperty(Nom, ConsWebNom);
-        Resource WolfgangMozart = model.createResource(MozartURI).addProperty(DCDA, MozartPOD).addProperty(DCDLe, MozartDOD).addProperty(MariDe, ConsWeber).addProperty(FilsDe, LeoMozart).addProperty(NeeLe, DOBMozart).addProperty(NeeA, BirthPlaceMozard).addProperty(Nom, MozartNom);
-        Resource ClaudioAbbado = model.createResource(ClaudioURI).addProperty(Nom, ClaudioNom);
-        Resource Partie = model.createResource(PartieURI).addProperty(PropertyPart4, Partie4).addProperty(PropertyPart3, Partie3).addProperty(PropertyPart2, Partie2).addProperty(PropertyPart1, Partie1);
-        Resource Jupiter = model.createResource(JupiterURI).addProperty(PartieDe, Partie).addProperty(EnregistrerSous, ClaudioAbbado).addProperty(OrchestreSymphonique, JupiterOrchestre).addProperty(AnneeEnregistrement, JupiterAnneeEnregistrement).addProperty(Type, JupiterType).addProperty(Propriete, JupiterPropritete).addProperty(Titre, JupiterTitre).addProperty(Compositeur, WolfgangMozart);
-        //Fichier XML
-        FileWriter RDFXMLOUT = new FileWriter("src/main/resources/Text.xml");
-        try {
-            model.write(RDFXMLOUT);
-        } finally {
-            try {
-                RDFXMLOUT.close();
-            } catch (IOException e) {
-                //ignore
-            }
-        }
-
-        //Fichier N-TRIPLET
-        FileWriter NTRIPLETOUT = new FileWriter("src/main/resources/Text.nt");
-        try {
-            model.write(NTRIPLETOUT, "N-TRIPLE");
-        } finally {
-            try {
-                NTRIPLETOUT.close();
-            } catch (IOException e) {
-                //ignore
-            }
-        }
-
-        //Fichier TURTLE
-        FileWriter TURTLEOUT = new FileWriter("src/main/resources/Text.ttl");
-        try {
-            model.write(TURTLEOUT, "TURTLE");
-        } finally {
-            try {
-                TURTLEOUT.close();
-            } catch (IOException e) {
-                //ignore
-            }
-        }
-//        DatasetGraph graphe =DatasetGraphFactory.create();
-//        graphe.
-
-        //Fichier JSON
-        /*
-        Ne reconnait pas le RDF/JSON
-        FileWriter JSONOUT = new FileWriter("Text.rj");
-        try {
-            model.write(JSONOUT, "RDF/JSON");
-        } finally {
-            try {
-                JSONOUT.close();
-            } catch (IOException e) {
-                //ignore
-            }
-        }*/
+        List<Pair<String, String>> prefix = new ArrayList<>();
+        prefix.add(new Pair<>("person", "http://personne/rdf/"));
+        prefix.add(new Pair<>("symphonie", "http://jupiter/rdf/"));
+        WebSemantique ws = new WebSemantique(ModelFactory.createDefaultModel(), prefix);
+        ws.CreateModel();
+        ws.writeModel("test");
+        ws.writeModel("test", "N-TRIPLE");
+        ws.writeModel("test", "TURTLE");
     }
 }
